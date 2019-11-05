@@ -730,8 +730,12 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 
     if(GameServer()->IsInstagib())
     {
+        //No selfkills
+        if(From == m_pPlayer->GetCID())
+            return true;
+
         // do damage Hit sound
-        if(From >= 0 && From != m_pPlayer->GetCID() && GameServer()->m_apPlayers[From])
+        if(From >= 0 && GameServer()->m_apPlayers[From])
         {
             int64 Mask = CmaskOne(From);
             for(int i = 0; i < MAX_CLIENTS; i++)
