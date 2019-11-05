@@ -63,6 +63,11 @@ int CGameControllerCTF::OnCharacterDeath(CCharacter *pVictim, CPlayer *pKiller, 
 	return HadFlag;
 }
 
+void CGameControllerCTF::OnCharacterSpawn(class CCharacter *pChr)
+{
+    IGameController::OnCharacterSpawn(pChr);
+}
+
 void CGameControllerCTF::OnFlagReturn(CFlag *pFlag)
 {
 	GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", "flag_return");

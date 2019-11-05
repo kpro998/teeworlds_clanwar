@@ -27,6 +27,7 @@ void CPickup::Reset()
 
 void CPickup::Tick()
 {
+    if(GameServer()->IsInstagib())
 	// wait for respawn
 	if(m_SpawnTick > 0)
 	{

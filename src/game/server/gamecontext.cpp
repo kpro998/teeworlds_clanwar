@@ -13,12 +13,18 @@
 
 #include "entities/character.h"
 #include "entities/projectile.h"
+
+//Pure mods
 #include "gamemodes/ctf.h"
 #include "gamemodes/dm.h"
 #include "gamemodes/lms.h"
 #include "gamemodes/lts.h"
 #include "gamemodes/mod.h"
 #include "gamemodes/tdm.h"
+
+//gCTF
+#include "gamemodes/gctf.h"
+
 #include "gamecontext.h"
 #include "player.h"
 
@@ -434,6 +440,13 @@ void CGameContext::CheckPureTuning()
 			m_Tuning = p;
 		}
 	}
+}
+
+bool CGameContext::IsInstagib()
+{
+    if(!m_pController)
+        return false;
+    return m_pController->IsInstagib();
 }
 
 void CGameContext::SendTuningParams(int ClientID)
@@ -1501,6 +1514,8 @@ void CGameContext::OnInit()
 		m_pController = new CGameControllerLTS(this);
 	else if(str_comp_nocase(g_Config.m_SvGametype, "tdm") == 0)
 		m_pController = new CGameControllerTDM(this);
+    else if(str_comp_nocase(g_Config.m_SvGametype, "gctf") == 0)
+		m_pController = new CGameControllerGCTF(this);
 	else
 		m_pController = new CGameControllerDM(this);
 
