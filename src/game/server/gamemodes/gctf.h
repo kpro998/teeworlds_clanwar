@@ -10,7 +10,7 @@ class CGameControllerGCTF : public CGameControllerCTF
 public:
 	CGameControllerGCTF(class CGameContext *pGameServer);
 	virtual void OnCharacterSpawn(class CCharacter *pChr);
-	virtual bool IsInstagib() { return true; }
+	virtual bool IsInstagib() const override { return true; }
 };
 
 #endif

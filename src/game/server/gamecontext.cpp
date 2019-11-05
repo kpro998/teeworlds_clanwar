@@ -256,16 +256,22 @@ bool CGameContext::SendCommand(int ChatterClientID, const char *pText)
     if(pText[0] == '!' || pText[0] == '/')
     {
         const char *text = pText+1;
+        int To = -2;
+        char answer[512];
         if(str_comp(text, "cmdlist")==0)
         {
+            To = ChatterClientID;
             //Send client command list
-        }
-        else if(str_comp(text, "help")==0)
-        {
-            //Send client how to play
+            str_format(answer, sizeof(answer), "/cmdlist - show all commands\n\
+                /info - who made this mod\n\
+                /restart - call restart vote\n\
+                /pause or /stop - pause game\n\
+                /go or /start - call unpause vote\n\
+                /1on1 to /8on8 - call vote to set player numbers");
         }
         else if(str_comp(text, "info")==0)
         {
+            To = ChatterClientID;
             //Send client server info
         }
         else if(str_comp(text, "restart")==0)
@@ -275,6 +281,7 @@ bool CGameContext::SendCommand(int ChatterClientID, const char *pText)
         else if(str_comp(text, "pause")==0 || str_comp(text, "stop")==0)
         {
             //Pause game if running
+            To = -1;
         }
         else if(str_comp(text, "go")==0 || str_comp(text, "start") == 0)
         {
@@ -288,11 +295,20 @@ bool CGameContext::SendCommand(int ChatterClientID, const char *pText)
             if(str_comp(text, xonx) == 0)
             {
                 //call vote set player numbers
-                return true;
+                break;
             }
 
         }
 
+        if(To != -2)
+        {
+            CNetMsg_Sv_Chat Msg;
+            Msg.m_Mode = CHAT_ALL;
+            Msg.m_ClientID = -1;//Comes from Server
+            Msg.m_pMessage = answer;
+            Msg.m_TargetID = To;
+            Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, To);
+        }
         return true;
     }
     return false;
