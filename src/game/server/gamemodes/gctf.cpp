@@ -22,5 +22,5 @@ void CGameControllerGCTF::OnCharacterSpawn(class CCharacter *pChr)
 	pChr->IncreaseHealth(10);
 
 	//TODO: default ammo
-	pChr->GiveWeapon(WEAPON_GRENADE, -1);
+	pChr->GiveWeapon(WEAPON_GRENADE, g_Config.m_SvGrenadeAmmoRegen ? g_Config.m_SvGrenadeAmmoRegenNum : -1);
 }

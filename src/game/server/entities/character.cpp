@@ -428,8 +428,34 @@ void CCharacter::HandleWeapons()
 	// fire Weapon, if wanted
 	FireWeapon();
 
-	// ammo regen
-	int AmmoRegenTime = g_pData->m_Weapons.m_aId[m_ActiveWeapon].m_Ammoregentime;
+	//Ammo regen on Grenade
+	int AmmoRegenTime = 0;
+	int MaxAmmo = 0;
+	if(GameServer()->IsInstagib())
+    {
+        if(m_ActiveWeapon == WEAPON_GRENADE && g_Config.m_SvGrenadeAmmoRegen)
+        {
+            AmmoRegenTime = g_Config.m_SvGrenadeAmmoRegenTime;
+            MaxAmmo = g_Config.m_SvGrenadeAmmoRegenNum;
+        }
+        else if(m_ActiveWeapon == WEAPON_LASER && g_Config.m_SvLaserAmmoRegen)
+        {
+            AmmoRegenTime = g_Config.m_SvLaserAmmoRegenTime;
+            MaxAmmo = g_Config.m_SvLaserAmmoRegenNum;
+        }
+        else
+        {
+            // ammo regen
+            AmmoRegenTime = g_pData->m_Weapons.m_aId[m_ActiveWeapon].m_Ammoregentime;
+            MaxAmmo = g_pData->m_Weapons.m_aId[m_ActiveWeapon].m_Maxammo;
+        }
+    }
+    else
+    {
+        // ammo regen
+        AmmoRegenTime = g_pData->m_Weapons.m_aId[m_ActiveWeapon].m_Ammoregentime;
+        MaxAmmo = g_pData->m_Weapons.m_aId[m_ActiveWeapon].m_Maxammo;
+    }
 	if(AmmoRegenTime && m_aWeapons[m_ActiveWeapon].m_Ammo >= 0)
 	{
 		// If equipped and not active, regen ammo?
@@ -441,8 +467,7 @@ void CCharacter::HandleWeapons()
 			if ((Server()->Tick() - m_aWeapons[m_ActiveWeapon].m_AmmoRegenStart) >= AmmoRegenTime * Server()->TickSpeed() / 1000)
 			{
 				// Add some ammo
-				m_aWeapons[m_ActiveWeapon].m_Ammo = min(m_aWeapons[m_ActiveWeapon].m_Ammo + 1,
-					g_pData->m_Weapons.m_aId[m_ActiveWeapon].m_Maxammo);
+				m_aWeapons[m_ActiveWeapon].m_Ammo = min(m_aWeapons[m_ActiveWeapon].m_Ammo + 1, MaxAmmo);
 				m_aWeapons[m_ActiveWeapon].m_AmmoRegenStart = -1;
 			}
 		}
@@ -750,7 +775,7 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
             }
             GameServer()->CreateSound(GameServer()->m_apPlayers[From]->m_ViewPos, SOUND_HIT, Mask);
         }
-        if(Weapon != WEAPON_GRENADE || (Weapon == WEAPON_GRENADE && Dmg >= 4))//TODO Settings
+        if(Weapon != WEAPON_GRENADE || (Weapon == WEAPON_GRENADE && Dmg >= g_Config.m_SvGrenadeMinDamage))//TODO Settings
         {
             Die(From, Weapon);
 
