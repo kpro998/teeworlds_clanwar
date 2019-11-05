@@ -710,96 +710,132 @@ void CCharacter::Die(int Killer, int Weapon)
 
 bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
 {
-	m_Core.m_Vel += Force;
+    //always add Force
+    m_Core.m_Vel += Force;
 
-	if(From >= 0)
-	{
-		if(GameServer()->m_pController->IsFriendlyFire(m_pPlayer->GetCID(), From))
-			return false;
-	}
-	else
-	{
-		int Team = TEAM_RED;
-		if(From == PLAYER_TEAM_BLUE)
-			Team = TEAM_BLUE;
-		if(GameServer()->m_pController->IsFriendlyTeamFire(m_pPlayer->GetTeam(), Team))
-			return false;
-	}
+    //always check teamdamage
+    if(From >= 0)
+    {
+        if(GameServer()->m_pController->IsFriendlyFire(m_pPlayer->GetCID(), From))
+            return false;
+    }
+    else
+    {
+        int Team = TEAM_RED;
+        if(From == PLAYER_TEAM_BLUE)
+            Team = TEAM_BLUE;
+        if(GameServer()->m_pController->IsFriendlyTeamFire(m_pPlayer->GetTeam(), Team))
+            return false;
+    }
 
-	// m_pPlayer only inflicts half damage on self
-	if(From == m_pPlayer->GetCID())
-		Dmg = max(1, Dmg/2);
+    if(GameServer()->IsInstagib())
+    {
+        // do damage Hit sound
+        if(From >= 0 && From != m_pPlayer->GetCID() && GameServer()->m_apPlayers[From])
+        {
+            int64 Mask = CmaskOne(From);
+            for(int i = 0; i < MAX_CLIENTS; i++)
+            {
+                if(GameServer()->m_apPlayers[i] && (GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS ||  GameServer()->m_apPlayers[i]->m_DeadSpecMode) &&
+                    GameServer()->m_apPlayers[i]->GetSpectatorID() == From)
+                    Mask |= CmaskOne(i);
+            }
+            GameServer()->CreateSound(GameServer()->m_apPlayers[From]->m_ViewPos, SOUND_HIT, Mask);
+        }
+        if(Weapon != WEAPON_GRENADE || (WEAPON == WEAPON_GRENADE && Dmg >= 4))
+        {
+            Die(From, Weapon);
 
-	int OldHealth = m_Health, OldArmor = m_Armor;
-	if(Dmg)
-	{
-		if(m_Armor)
-		{
-			if(Dmg > 1)
-			{
-				m_Health--;
-				Dmg--;
-			}
+            // set attacker's face to happy (taunt!)
+            if (From >= 0 && From != m_pPlayer->GetCID() && GameServer()->m_apPlayers[From])
+            {
+                CCharacter *pChr = GameServer()->m_apPlayers[From]->GetCharacter();
+                if (pChr)
+                {
+                    pChr->m_EmoteType = EMOTE_HAPPY;
+                    pChr->m_EmoteStop = Server()->Tick() + Server()->TickSpeed();
+                }
+            }
+            return false;
+        }
+    }
+    else//only on standard mod
+    {
+        // m_pPlayer only inflicts half damage on self
+        if(From == m_pPlayer->GetCID())
+            Dmg = max(1, Dmg/2);
 
-			if(Dmg > m_Armor)
-			{
-				Dmg -= m_Armor;
-				m_Armor = 0;
-			}
-			else
-			{
-				m_Armor -= Dmg;
-				Dmg = 0;
-			}
-		}
+        int OldHealth = m_Health, OldArmor = m_Armor;
+        if(Dmg)
+        {
+            if(m_Armor)
+            {
+                if(Dmg > 1)
+                {
+                    m_Health--;
+                    Dmg--;
+                }
 
-		m_Health -= Dmg;
-	}
+                if(Dmg > m_Armor)
+                {
+                    Dmg -= m_Armor;
+                    m_Armor = 0;
+                }
+                else
+                {
+                    m_Armor -= Dmg;
+                    Dmg = 0;
+                }
+            }
 
-	// create healthmod indicator
-	GameServer()->CreateDamage(m_Pos, m_pPlayer->GetCID(), Source, OldHealth-m_Health, OldArmor-m_Armor, From == m_pPlayer->GetCID());
+            m_Health -= Dmg;
+        }
 
-	// do damage Hit sound
-	if(From >= 0 && From != m_pPlayer->GetCID() && GameServer()->m_apPlayers[From])
-	{
-		int64 Mask = CmaskOne(From);
-		for(int i = 0; i < MAX_CLIENTS; i++)
-		{
-			if(GameServer()->m_apPlayers[i] && (GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS ||  GameServer()->m_apPlayers[i]->m_DeadSpecMode) &&
-				GameServer()->m_apPlayers[i]->GetSpectatorID() == From)
-				Mask |= CmaskOne(i);
-		}
-		GameServer()->CreateSound(GameServer()->m_apPlayers[From]->m_ViewPos, SOUND_HIT, Mask);
-	}
+        // create healthmod indicator
+        GameServer()->CreateDamage(m_Pos, m_pPlayer->GetCID(), Source, OldHealth-m_Health, OldArmor-m_Armor, From == m_pPlayer->GetCID());
 
-	// check for death
-	if(m_Health <= 0)
-	{
-		Die(From, Weapon);
+        // do damage Hit sound
+        if(From >= 0 && From != m_pPlayer->GetCID() && GameServer()->m_apPlayers[From])
+        {
+            int64 Mask = CmaskOne(From);
+            for(int i = 0; i < MAX_CLIENTS; i++)
+            {
+                if(GameServer()->m_apPlayers[i] && (GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS ||  GameServer()->m_apPlayers[i]->m_DeadSpecMode) &&
+                    GameServer()->m_apPlayers[i]->GetSpectatorID() == From)
+                    Mask |= CmaskOne(i);
+            }
+            GameServer()->CreateSound(GameServer()->m_apPlayers[From]->m_ViewPos, SOUND_HIT, Mask);
+        }
 
-		// set attacker's face to happy (taunt!)
-		if (From >= 0 && From != m_pPlayer->GetCID() && GameServer()->m_apPlayers[From])
-		{
-			CCharacter *pChr = GameServer()->m_apPlayers[From]->GetCharacter();
-			if (pChr)
-			{
-				pChr->m_EmoteType = EMOTE_HAPPY;
-				pChr->m_EmoteStop = Server()->Tick() + Server()->TickSpeed();
-			}
-		}
+        // check for death
+        if(m_Health <= 0)
+        {
+            Die(From, Weapon);
 
-		return false;
-	}
+            // set attacker's face to happy (taunt!)
+            if (From >= 0 && From != m_pPlayer->GetCID() && GameServer()->m_apPlayers[From])
+            {
+                CCharacter *pChr = GameServer()->m_apPlayers[From]->GetCharacter();
+                if (pChr)
+                {
+                    pChr->m_EmoteType = EMOTE_HAPPY;
+                    pChr->m_EmoteStop = Server()->Tick() + Server()->TickSpeed();
+                }
+            }
 
-	if (Dmg > 2)
-		GameServer()->CreateSound(m_Pos, SOUND_PLAYER_PAIN_LONG);
-	else
-		GameServer()->CreateSound(m_Pos, SOUND_PLAYER_PAIN_SHORT);
+            return false;
+        }
 
-	m_EmoteType = EMOTE_PAIN;
-	m_EmoteStop = Server()->Tick() + 500 * Server()->TickSpeed() / 1000;
+        if (Dmg > 2)
+            GameServer()->CreateSound(m_Pos, SOUND_PLAYER_PAIN_LONG);
+        else
+            GameServer()->CreateSound(m_Pos, SOUND_PLAYER_PAIN_SHORT);
 
-	return true;
+        m_EmoteType = EMOTE_PAIN;
+        m_EmoteStop = Server()->Tick() + 500 * Server()->TickSpeed() / 1000;
+
+        return true;
+    }
 }
 
 void CCharacter::Snap(int SnappingClient)
