@@ -131,6 +131,20 @@ MACRO_CONFIG_INT(SvVoteKick, sv_vote_kick, 1, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER,
 MACRO_CONFIG_INT(SvVoteKickMin, sv_vote_kick_min, 0, 0, MAX_CLIENTS, CFGFLAG_SAVE|CFGFLAG_SERVER, "Minimum number of players required to start a kick vote")
 MACRO_CONFIG_INT(SvVoteKickBantime, sv_vote_kick_bantime, 5, 0, 1440, CFGFLAG_SAVE|CFGFLAG_SERVER, "The time to ban a player if kicked by vote. 0 makes it just use kick")
 
+MACRO_CONFIG_INT(SvGrenadeAmmoRegen, sv_grenade_ammo_regen, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Activate or deactivate grenade ammo regeneration in general")
+MACRO_CONFIG_INT(SvGrenadeAmmoRegenTime, sv_grenade_ammo_regen_time, 128, 1, 2000, CFGFLAG_SAVE|CFGFLAG_SERVER, "Grenade ammo regeneration time in miliseconds")
+MACRO_CONFIG_INT(SvGrenadeAmmoRegenNum, sv_grenade_ammo_regen_num, 6, 1, 10, CFGFLAG_SAVE|CFGFLAG_SERVER, "Maximum number of grenades if ammo regeneration on")
+MACRO_CONFIG_INT(SvGrenadeAmmoRegenSpeedNade, sv_grenade_ammo_regen_speed, 1, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Give grenades back that push own player")
+
+MACRO_CONFIG_INT(SvGrenadeMinDamage, sv_grenade_min_damage, 4, 1, 6, CFGFLAG_SAVE|CFGFLAG_SERVER, "Minimum damage to kill player, grenade spawns explosions")
+
+MACRO_CONFIG_INT(SvLaserAmmoRegen, sv_laser_ammo_regen, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Activate or deactivate Laser ammo regeneration in general")
+MACRO_CONFIG_INT(SvLaserAmmoRegenTime, sv_laser_ammo_regen_time, 128, 1, 2000, CFGFLAG_SAVE|CFGFLAG_SERVER, "Laser ammo regeneration time in miliseconds")
+MACRO_CONFIG_INT(SvLaserAmmoRegenNum, sv_laser_ammo_regen_num, 6, 1, 10, CFGFLAG_SAVE|CFGFLAG_SERVER, "Maximum number of Lasers if ammo regeneration on")
+
+MACRO_CONFIG_INT(SvLaserJumps, sv_laser_jumps, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Activate or deactivate laser jumps")
+
+
 // debug
 #ifdef CONF_DEBUG // this one can crash the server if not used correctly
 	MACRO_CONFIG_INT(DbgDummies, dbg_dummies, 0, 0, MAX_CLIENTS, CFGFLAG_SERVER, "")
