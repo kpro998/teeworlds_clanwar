@@ -197,6 +197,12 @@ void CGameContext::CreateSound(vec2 Pos, int Sound, int64 Mask)
 
 void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 {
+    if(Mode == CHAT_ALL)
+    {
+        if(SendCommand(ChatterClientID, pText))
+            return;
+    }
+
 	char aBuf[256];
 	if(ChatterClientID >= 0 && ChatterClientID < MAX_CLIENTS)
 		str_format(aBuf, sizeof(aBuf), "%d:%d:%s: %s", ChatterClientID, Mode, Server()->ClientName(ChatterClientID), pText);
@@ -243,6 +249,53 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ChatterClientID);
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, To);
 	}
+}
+
+bool CGameContext::SendCommand(int ChatterClientID, const char *pText)
+{
+    if(pText[0] == '!' || pText[0] == '/')
+    {
+        const char *text = pText+1;
+        if(str_comp(text, "cmdlist")==0)
+        {
+            //Send client command list
+        }
+        else if(str_comp(text, "help")==0)
+        {
+            //Send client how to play
+        }
+        else if(str_comp(text, "info")==0)
+        {
+            //Send client server info
+        }
+        else if(str_comp(text, "restart")==0)
+        {
+            //Call restart vote
+        }
+        else if(str_comp(text, "pause")==0 || str_comp(text, "stop")==0)
+        {
+            //Pause game if running
+        }
+        else if(str_comp(text, "go")==0 || str_comp(text, "start") == 0)
+        {
+            //Call vote, let game run if paused
+        }
+
+        char xonx[4];
+        for(int i = 1; i <= 8; ++i)
+        {
+            str_format(xonx, sizeof(xonx), "%don%d", i, i);
+            if(str_comp(text, xonx) == 0)
+            {
+                //call vote set player numbers
+                return true;
+            }
+
+        }
+
+        return true;
+    }
+    return false;
 }
 
 void CGameContext::SendBroadcast(const char* pText, int ClientID)
