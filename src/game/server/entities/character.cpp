@@ -59,7 +59,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_EmoteStop = -1;
 	m_LastAction = -1;
 	m_LastNoAmmoSound = -1;
-	m_ActiveWeapon = WEAPON_GUN;
+	m_ActiveWeapon = WEAPON_HAMMER;
 	m_LastWeapon = WEAPON_HAMMER;
 	m_QueuedWeapon = -1;
 
@@ -461,6 +461,10 @@ bool CCharacter::GiveWeapon(int Weapon, int Ammo)
 	{
 		m_aWeapons[Weapon].m_Got = true;
 		m_aWeapons[Weapon].m_Ammo = min(g_pData->m_Weapons.m_aId[Weapon].m_Maxammo, Ammo);
+		if(!m_aWeapons[m_ActiveWeapon].m_Got) {
+            m_ActiveWeapon = Weapon;
+            m_LastWeapon = Weapon;
+        }
 		return true;
 	}
 	return false;
