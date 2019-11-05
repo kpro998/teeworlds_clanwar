@@ -742,7 +742,7 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
             }
             GameServer()->CreateSound(GameServer()->m_apPlayers[From]->m_ViewPos, SOUND_HIT, Mask);
         }
-        if(Weapon != WEAPON_GRENADE || (Weapon == WEAPON_GRENADE && Dmg >= 4))
+        if(Weapon != WEAPON_GRENADE || (Weapon == WEAPON_GRENADE && Dmg >= 4))//TODO Settings
         {
             Die(From, Weapon);
 
