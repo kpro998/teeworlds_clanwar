@@ -737,6 +737,11 @@ void CCharacter::Die(int Killer, int Weapon)
 	GameServer()->CreateDeath(m_Pos, m_pPlayer->GetCID());
 }
 
+int CCharacter::HookedPlayer()
+{
+    return m_Core.m_HookedPlayer;
+}
+
 bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
 {
     //always add Force
@@ -761,7 +766,23 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
     {
         //No selfkills
         if(From == m_pPlayer->GetCID())
+        {
+            //Give back ammo on grenade self push//Only if not infinite ammo and activated
+            if(Weapon == WEAPON_GRENADE && g_Config.m_SvGrenadeAmmoRegen && g_Config.m_SvGrenadeAmmoRegenSpeedNade)
+            {
+                GiveWeapon(WEAPON_GRENADE, m_aWeapons[WEAPON_GRENADE].m_Ammo+1);
+            }
+            //TODO do this for laserjumps?
             return true;
+        }
+
+        //Check hook kills
+        //From must exist and live and has this player hooked
+        if(g_Config.m_SvHookKill && From >= 0 && GameServer()->m_apPlayers[From] && GameServer()->m_apPlayers[From]->GetCharacter() &&
+            GameServer()->m_apPlayers[From]->GetCharacter()->HookedPlayer() != m_pPlayer->GetCID())
+        {
+            return true;
+        }
 
         // do damage Hit sound
         if(From >= 0 && GameServer()->m_apPlayers[From])

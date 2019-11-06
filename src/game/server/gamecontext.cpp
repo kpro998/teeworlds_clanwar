@@ -197,7 +197,7 @@ void CGameContext::CreateSound(vec2 Pos, int Sound, int64 Mask)
 
 void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 {
-    if(Mode == CHAT_ALL)
+    if(Mode == CHAT_ALL && ChatterClientID != -1)
     {
         if(SendCommand(ChatterClientID, pText))
             return;
@@ -256,36 +256,41 @@ bool CGameContext::SendCommand(int ChatterClientID, const char *pText)
     if(pText[0] == '!' || pText[0] == '/')
     {
         const char *text = pText+1;
-        int To = -2;
-        char answer[512];
+
         if(str_comp(text, "cmdlist")==0)
         {
-            To = ChatterClientID;
             //Send client command list
-            str_format(answer, sizeof(answer), "/cmdlist - show all commands\n\
-                /info - who made this mod\n\
-                /restart - call restart vote\n\
-                /pause or /stop - pause game\n\
-                /go or /start - call unpause vote\n\
-                /1on1 to /8on8 - call vote to set player numbers");
+            const int num_messages = 7;
+            char strs[num_messages][128] = {"~~~CMDLIST~~~", "/cmdlist - show all commands", "/info - who made this mod", "/restart - call restart vote", "/pause or /stop - pause game",
+                "/go or /start - call unpause vote", "/1on1 to /8on8 - call vote to set player numbers"};
+            for(int i = 0; i < num_messages; ++i)
+            {
+                SendChat(-1, CHAT_ALL, ChatterClientID, strs[i]);
+            }
         }
         else if(str_comp(text, "info")==0)
         {
-            To = ChatterClientID;
             //Send client server info
+            const int num_messages = 5;
+            char strs[num_messages][128] = {"~~~INFO~~~", "Clanwar-Mod by AssassinTee", "enjoy :)", "Give me a star on GitHub!", "https://github.com/AssassinTee/teeworlds_clanwar"};
+            for(int i = 0; i < num_messages; ++i)
+            {
+                SendChat(-1, CHAT_ALL, ChatterClientID, strs[i]);
+            }
         }
         else if(str_comp(text, "restart")==0)
         {
-            //Call restart vote
+            CreateCustomVote(ChatterClientID, "Restart", "restart", Server()->ClientName(ChatterClientID));
         }
         else if(str_comp(text, "pause")==0 || str_comp(text, "stop")==0)
         {
-            //Pause game if running
-            To = -1;
+            if(!m_pController->IsGamePaused())
+                Console()->ExecuteLine("pause");
         }
         else if(str_comp(text, "go")==0 || str_comp(text, "start") == 0)
         {
-            //Call vote, let game run if paused
+            if(m_pController->IsGamePaused())
+                CreateCustomVote(ChatterClientID, "Go", "pause", Server()->ClientName(ChatterClientID));
         }
 
         char xonx[4];
@@ -295,19 +300,12 @@ bool CGameContext::SendCommand(int ChatterClientID, const char *pText)
             if(str_comp(text, xonx) == 0)
             {
                 //call vote set player numbers
+                char aBuf[32];
+                str_format(aBuf, sizeof(aBuf), "set_player_num %d", 2*i);
+                CreateCustomVote(ChatterClientID, xonx, aBuf, Server()->ClientName(ChatterClientID));
                 break;
             }
 
-        }
-
-        if(To != -2)
-        {
-            CNetMsg_Sv_Chat Msg;
-            Msg.m_Mode = CHAT_ALL;
-            Msg.m_ClientID = -1;//Comes from Server
-            Msg.m_pMessage = answer;
-            Msg.m_TargetID = To;
-            Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, To);
         }
         return true;
     }
@@ -391,6 +389,26 @@ void CGameContext::SendGameMsg(int GameMsgID, int ParaI1, int ParaI2, int ParaI3
 	Msg.AddInt(ParaI2);
 	Msg.AddInt(ParaI3);
 	Server()->SendMsg(&Msg, MSGFLAG_VITAL, ClientID);
+}
+
+void CGameContext::CreateCustomVote(int CreatorID, const char* pDesc, const char* pCommand, const char* pReason)
+{
+    char aDesc[VOTE_DESC_LENGTH] = {0};
+    char aCmd[VOTE_CMD_LENGTH] = {0};
+
+    //CVoteOptionServer *pOption = m_pVoteOptionFirst;
+
+    str_format(aDesc, sizeof(aDesc), "%s", pDesc);
+    str_format(aCmd, sizeof(aCmd), "%s", pCommand);
+	m_VoteType = VOTE_START_OP;
+
+    m_VoteCreator = CreatorID;
+    StartVote(aDesc, aCmd, pReason);
+
+    CPlayer *pPlayer = m_apPlayers[CreatorID];
+    pPlayer->m_Vote = 1;
+    pPlayer->m_VotePos = m_VotePos = 1;
+    pPlayer->m_LastVoteCall = Server()->Tick();
 }
 
 //
@@ -1243,6 +1261,13 @@ void CGameContext::ConRestart(IConsole::IResult *pResult, void *pUserData)
 		pSelf->m_pController->DoWarmup(0);
 }
 
+void CGameContext::ConSetPlayerNum(IConsole::IResult *pResult, void *pUserData)
+{
+	//CGameContext *pSelf = (CGameContext *)pUserData;
+	if(pResult->NumArguments())
+		g_Config.m_SvPlayerSlots = pResult->GetInteger(0);
+}
+
 void CGameContext::ConSay(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
@@ -1543,6 +1568,7 @@ void CGameContext::OnConsoleInit()
 	Console()->Register("pause", "?i", CFGFLAG_SERVER|CFGFLAG_STORE, ConPause, this, "Pause/unpause game");
 	Console()->Register("change_map", "?r", CFGFLAG_SERVER|CFGFLAG_STORE, ConChangeMap, this, "Change map");
 	Console()->Register("restart", "?i", CFGFLAG_SERVER|CFGFLAG_STORE, ConRestart, this, "Restart in x seconds (0 = abort)");
+	Console()->Register("set_player_num", "?i", CFGFLAG_SERVER|CFGFLAG_STORE, ConSetPlayerNum, this, "Set the player number");
 	Console()->Register("say", "r", CFGFLAG_SERVER, ConSay, this, "Say in chat");
 	Console()->Register("broadcast", "r", CFGFLAG_SERVER, ConBroadcast, this, "Broadcast message");
 	Console()->Register("set_team", "ii?i", CFGFLAG_SERVER, ConSetTeam, this, "Set team of player to team");

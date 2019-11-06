@@ -13,7 +13,7 @@
 CGameControllerGCTF::CGameControllerGCTF(CGameContext *pGameServer)
 : CGameControllerCTF(pGameServer)
 {
-	m_pGameType = "gCTF";
+	m_pGameType = "gCTF+";
 }
 
 void CGameControllerGCTF::OnCharacterSpawn(class CCharacter *pChr)

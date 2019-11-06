@@ -48,6 +48,7 @@ class CGameContext : public IGameServer
 	static void ConPause(IConsole::IResult *pResult, void *pUserData);
 	static void ConChangeMap(IConsole::IResult *pResult, void *pUserData);
 	static void ConRestart(IConsole::IResult *pResult, void *pUserData);
+	static void ConSetPlayerNum(IConsole::IResult *pResult, void *pUserData);
 	static void ConSay(IConsole::IResult *pResult, void *pUserData);
 	static void ConBroadcast(IConsole::IResult *pResult, void *pUserData);
 	static void ConSetTeam(IConsole::IResult *pResult, void *pUserData);
@@ -92,6 +93,7 @@ public:
 
 	// voting
 	void StartVote(const char *pDesc, const char *pCommand, const char *pReason);
+	void CreateCustomVote(int CreatorID, const char* pDesc, const char* pCommand, const char* pReason);
 	void EndVote(int Type, bool Force);
 	void ForceVote(int Type, const char *pDescription, const char *pReason);
 	void SendVoteSet(int Type, int ToClientID);
