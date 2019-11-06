@@ -224,10 +224,10 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 	Msg.m_Mode = Mode;
 	Msg.m_ClientID = ChatterClientID;
 	Msg.m_pMessage = pText;
-	Msg.m_TargetID = -1;
+	Msg.m_TargetID = ChatterClientID == -1 ? To : -1;
 
 	if(Mode == CHAT_ALL)
-		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
+		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ChatterClientID == -1 ? To : -1);
 	else if(Mode == CHAT_TEAM)
 	{
 		// pack one for the recording only
@@ -293,19 +293,20 @@ bool CGameContext::SendCommand(int ChatterClientID, const char *pText)
                 CreateCustomVote(ChatterClientID, "Go", "pause", Server()->ClientName(ChatterClientID));
         }
 
-        char xonx[4];
-        for(int i = 1; i <= 8; ++i)
+        if(str_length(text) == 4)
         {
-            str_format(xonx, sizeof(xonx), "%don%d", i, i);
-            if(str_comp(text, xonx) == 0)
+            int val = (int)(text[0]-'0');
+            int val2 = (int)(text[3]-'0');
+
+            if(val >= 1 && val <= 8 && val == val2 && text[1] == 'o' && text[2] == 'n')
             {
                 //call vote set player numbers
                 char aBuf[32];
-                str_format(aBuf, sizeof(aBuf), "set_player_num %d", 2*i);
-                CreateCustomVote(ChatterClientID, xonx, aBuf, Server()->ClientName(ChatterClientID));
-                break;
+                char bBuf[16];
+                str_format(aBuf, sizeof(aBuf), "set_player_num %d", 2*val);
+                str_format(bBuf, sizeof(bBuf), "%d on %d", val, val);
+                CreateCustomVote(ChatterClientID, bBuf, aBuf, Server()->ClientName(ChatterClientID));
             }
-
         }
         return true;
     }
