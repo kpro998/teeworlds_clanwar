@@ -778,26 +778,27 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 
         //Check hook kills
         //From must exist and live and has this player hooked
-        if(g_Config.m_SvHookKill && From >= 0 && GameServer()->m_apPlayers[From] && GameServer()->m_apPlayers[From]->GetCharacter() &&
-            GameServer()->m_apPlayers[From]->GetCharacter()->HookedPlayer() != m_pPlayer->GetCID())
+        if(g_Config.m_SvHookKill && (From < 0 || !GameServer()->m_apPlayers[From] || !GameServer()->m_apPlayers[From]->GetCharacter() ||
+            GameServer()->m_apPlayers[From]->GetCharacter()->HookedPlayer() != m_pPlayer->GetCID()))
         {
             return true;
         }
 
-        // do damage Hit sound
-        if(From >= 0 && GameServer()->m_apPlayers[From])
-        {
-            int64 Mask = CmaskOne(From);
-            for(int i = 0; i < MAX_CLIENTS; i++)
-            {
-                if(GameServer()->m_apPlayers[i] && (GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS ||  GameServer()->m_apPlayers[i]->m_DeadSpecMode) &&
-                    GameServer()->m_apPlayers[i]->GetSpectatorID() == From)
-                    Mask |= CmaskOne(i);
-            }
-            GameServer()->CreateSound(GameServer()->m_apPlayers[From]->m_ViewPos, SOUND_HIT, Mask);
-        }
         if(Weapon != WEAPON_GRENADE || (Weapon == WEAPON_GRENADE && Dmg >= g_Config.m_SvGrenadeMinDamage))//TODO Settings
         {
+             // do damage Hit sound
+            if(From >= 0 && GameServer()->m_apPlayers[From])
+            {
+                int64 Mask = CmaskOne(From);
+                for(int i = 0; i < MAX_CLIENTS; i++)
+                {
+                    if(GameServer()->m_apPlayers[i] && (GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS ||  GameServer()->m_apPlayers[i]->m_DeadSpecMode) &&
+                        GameServer()->m_apPlayers[i]->GetSpectatorID() == From)
+                        Mask |= CmaskOne(i);
+                }
+                GameServer()->CreateSound(GameServer()->m_apPlayers[From]->m_ViewPos, SOUND_HIT, Mask);
+            }
+
             Die(From, Weapon);
 
             // set attacker's face to happy (taunt!)
