@@ -267,6 +267,7 @@ bool CGameContext::SendCommand(int ChatterClientID, const char *pText)
             {
                 SendChat(-1, CHAT_ALL, ChatterClientID, strs[i]);
             }
+            return true;
         }
         else if(str_comp(text, "info")==0)
         {
@@ -277,20 +278,49 @@ bool CGameContext::SendCommand(int ChatterClientID, const char *pText)
             {
                 SendChat(-1, CHAT_ALL, ChatterClientID, strs[i]);
             }
+            return true;
         }
         else if(str_comp(text, "restart")==0)
         {
-            CreateCustomVote(ChatterClientID, "Restart", "restart", Server()->ClientName(ChatterClientID));
+            if(m_apPlayers[ChatterClientID]->GetTeam() != TEAM_SPECTATORS)
+            {
+                CreateCustomVote(ChatterClientID, "Restart", "restart", Server()->ClientName(ChatterClientID));
+            }
+            else
+            {
+                SendChat(-1, CHAT_ALL, ChatterClientID, "Specators aren't allowed to vote 'restart'");
+            }
+            return true;
         }
         else if(str_comp(text, "pause")==0 || str_comp(text, "stop")==0)
         {
-            if(!m_pController->IsGamePaused())
-                Console()->ExecuteLine("pause");
+            if(m_apPlayers[ChatterClientID]->GetTeam() != TEAM_SPECTATORS)
+            {
+                if(!m_pController->IsGamePaused())
+                    Console()->ExecuteLine("pause");
+                else
+                    SendChat(-1, CHAT_ALL, ChatterClientID, "Game is already paused");
+            }
+            else
+            {
+                SendChat(-1, CHAT_ALL, ChatterClientID, "Specators aren't allowed to vote 'pause'");
+            }
+            return true;
         }
         else if(str_comp(text, "go")==0 || str_comp(text, "start") == 0)
         {
-            if(m_pController->IsGamePaused())
-                CreateCustomVote(ChatterClientID, "Go", "pause", Server()->ClientName(ChatterClientID));
+            if(m_apPlayers[ChatterClientID]->GetTeam() != TEAM_SPECTATORS)
+            {
+                if(m_pController->IsGamePaused())
+                    CreateCustomVote(ChatterClientID, "Go", "pause", Server()->ClientName(ChatterClientID));
+                else
+                    SendChat(-1, CHAT_ALL, ChatterClientID, "Game is already running");
+            }
+            else
+            {
+                SendChat(-1, CHAT_ALL, ChatterClientID, "Specators aren't allowed to vote 'go'");
+            }
+            return true;
         }
 
         if(str_length(text) == 4)
@@ -301,12 +331,26 @@ bool CGameContext::SendCommand(int ChatterClientID, const char *pText)
             if(val >= 1 && val <= 8 && val == val2 && text[1] == 'o' && text[2] == 'n')
             {
                 //call vote set player numbers
-                char aBuf[32];
-                char bBuf[16];
-                str_format(aBuf, sizeof(aBuf), "set_player_num %d", 2*val);
-                str_format(bBuf, sizeof(bBuf), "%d on %d", val, val);
-                CreateCustomVote(ChatterClientID, bBuf, aBuf, Server()->ClientName(ChatterClientID));
+                if(m_apPlayers[ChatterClientID]->GetTeam() != TEAM_SPECTATORS)
+                {
+                    char aBuf[32];
+                    char bBuf[16];
+                    str_format(aBuf, sizeof(aBuf), "set_player_num %d", 2*val);
+                    str_format(bBuf, sizeof(bBuf), "%d on %d", val, val);
+                    CreateCustomVote(ChatterClientID, bBuf, aBuf, Server()->ClientName(ChatterClientID));
+                }
+                else
+                {
+                    SendChat(-1, CHAT_ALL, ChatterClientID, "Specators aren't allowed to vote player numbers");
+                }
+                return true;
             }
+        }
+        if(str_length(pText) < 256)
+        {
+            char aBuf[256];
+            str_format(aBuf, sizeof(aBuf), "unknown command '%s'", pText);
+            SendChat(-1, CHAT_ALL, ChatterClientID, aBuf);
         }
         return true;
     }
