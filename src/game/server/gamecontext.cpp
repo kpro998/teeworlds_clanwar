@@ -261,7 +261,7 @@ bool CGameContext::SendCommand(int ChatterClientID, const char *pText)
         {
             //Send client command list
             const int num_messages = 7;
-            char strs[num_messages][128] = {"~~~CMDLIST~~~", "/cmdlist - show all commands", "/info - who made this mod", "/restart - call restart vote", "/pause or /stop - pause game",
+            char strs[num_messages][128] = {"~~~CMDLIST~~~", "/cmdlist - show all commands", "/info - who made this mod", "/restart or /restart <time> - call restart vote", "/pause or /stop - pause game",
                 "/go or /start - call unpause vote", "/1on1 to /8on8 - call vote to set player numbers"};
             for(int i = 0; i < num_messages; ++i)
             {
