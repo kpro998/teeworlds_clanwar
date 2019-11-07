@@ -280,11 +280,32 @@ bool CGameContext::SendCommand(int ChatterClientID, const char *pText)
             }
             return true;
         }
-        else if(str_comp(text, "restart")==0)
+        else if(str_startswith(text, "restart") != 0)
         {
             if(m_apPlayers[ChatterClientID]->GetTeam() != TEAM_SPECTATORS)
             {
-                CreateCustomVote(ChatterClientID, "Restart", "restart", Server()->ClientName(ChatterClientID));
+                //only restart
+                if(str_comp(text, "restart")==0)
+                {
+                    CreateCustomVote(ChatterClientID, "Restart 10 seconds", "restart 10", Server()->ClientName(ChatterClientID));
+                }
+                else
+                {
+                    const char* after_restart = str_startswith(text, "restart");
+                    int seconds = str_toint(after_restart);
+                    if(seconds > 0 && seconds <= 60)
+                    {
+                        char aBuf[16];
+                        char bBuf[64];
+                        str_format(aBuf, sizeof(aBuf), "restart %d", seconds);
+                        str_format(bBuf, sizeof(bBuf), "Restart %d second(s)", seconds);
+                        CreateCustomVote(ChatterClientID, bBuf, aBuf, Server()->ClientName(ChatterClientID));
+                    }
+                    else
+                    {
+                        SendChat(-1, CHAT_ALL, ChatterClientID, "Restart only from 1 to 60 seconds!");
+                    }
+                }
             }
             else
             {
