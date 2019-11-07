@@ -1,11 +1,39 @@
-<a href="https://repology.org/metapackage/teeworlds/versions">
-    <img src="https://repology.org/badge/vertical-allrepos/teeworlds.svg" alt="Packaging status" align="right">
-</a>
+TODO Badges!
 
-Teeworlds [![CircleCI](https://circleci.com/gh/teeworlds/teeworlds.svg?style=svg)](https://circleci.com/gh/teeworlds/teeworlds) [![Travis CI Build Status](https://travis-ci.org/teeworlds/teeworlds.svg?branch=master)](https://travis-ci.org/teeworlds/teeworlds) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/teeworlds/teeworlds?branch=master&svg=true)](https://ci.appveyor.com/project/heinrich5991/teeworlds)
-=========
+# clanwar Mod
 
-A retro multiplayer shooter
+The Clanwar mod is a mod that supports all vanilla Games like `CTF`, `DM`, `TDM`, `LMS`, `LTS` and some instagib mods like
+`gCTF`, and `iCTF`.
+
+The mods are renamed and a `+` symbol is added (`gCTF` -> `gCTF+`).
+
+It allows chatcommands and has some variables (only for Instagib)
+
+| chatcommand         | desciprtion                   |
+| ------------------- | ----------------------------- |
+| `/cmdlist`          | Show all commands             |
+| `/info`             | Show mod info                 |
+| `/restart`          | Call restart vote             |
+| `/stop` or `/pause` | Pause game                    |
+| `/go` or `/start`   | Call vote to resume game      |
+| `/1on1` to `/8on8`  | Call vote to set player limit |
+
+## server commands/variables
+
+| command                     | default | min | max  | description                                        |
+| --------------------------- | ------- | --- | ---- | -------------------------------------------------- |
+| sv_grenade_ammo_regen       | 0       | 0   | 1    | Activate grenade spam protection                   |
+| sv_grenade_ammo_regen_time  | 128     | 1   | 2000 | Grenade ammo regeneration time in ms               |
+| sv_grenade_ammo_regen_num   | 6       | 1   | 10   | Maximum number of grenades if ammo regeneration on |
+| sv_grenade_ammo_regen_speed | 1       | 0   | 1    | Give grenades back that push own player            |
+| sv_grenade_min_damage       | 4       | 1   | 6    | Minimum damage required for a kill                 |
+| sv_laser_ammo_regen         | 0       | 0   | 1    | Activate laser spam protection                     |
+| sv_laser_ammo_regen_time    | 128     | 1   | 2000 | laser ammo regeneration time in ms                 |
+| sv_laser_ammo_regen_num     | 6       | 1   | 10   | Maximum number of lasers if ammo regeneration on   |
+| sv_laser_jump               | 0       | 0   | 1    | Laser jumps (Currently not working!)               |
+| sv_hook_kill                | 0       | 0   | 1    | Allow only kills on hooked players                 |
+
+## Teeworlds - A retro multiplayer shooter
 ---------------------------
 
 Teeworlds is a free online multiplayer game, available for all major
