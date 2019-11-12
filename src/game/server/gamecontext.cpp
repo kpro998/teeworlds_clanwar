@@ -320,9 +320,9 @@ bool CGameContext::SendCommand(int ChatterClientID, const char *pText)
                 if(!m_pController->IsGamePaused())
                 {
                     Console()->ExecuteLine("pause");
-                    char aBuf[64];
+                    char aBuf[128];
                     str_format(aBuf, sizeof(aBuf), "'%s' paused the game!", Server()->ClientName(ChatterClientID));
-                    SendChat(-1, CHAT_ALL, -1, aBuf);
+                    SendChat(-1, CHAT_ALL, -1, a);
                 }
                 else
                 {
