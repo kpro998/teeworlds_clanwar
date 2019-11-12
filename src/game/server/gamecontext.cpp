@@ -322,7 +322,7 @@ bool CGameContext::SendCommand(int ChatterClientID, const char *pText)
                     Console()->ExecuteLine("pause");
                     char aBuf[128];
                     str_format(aBuf, sizeof(aBuf), "'%s' paused the game!", Server()->ClientName(ChatterClientID));
-                    SendChat(-1, CHAT_ALL, -1, a);
+                    SendChat(-1, CHAT_ALL, -1, aBuf);
                 }
                 else
                 {
