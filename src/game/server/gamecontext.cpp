@@ -318,9 +318,16 @@ bool CGameContext::SendCommand(int ChatterClientID, const char *pText)
             if(m_apPlayers[ChatterClientID]->GetTeam() != TEAM_SPECTATORS)
             {
                 if(!m_pController->IsGamePaused())
+                {
                     Console()->ExecuteLine("pause");
+                    char aBuf[64];
+                    str_format(aBuf, sizeof(aBuf), "'%s' paused the game!", Server()->ClientName(ChatterClientID));
+                    SendChat(-1, CHAT_ALL, -1, aBuf);
+                }
                 else
+                {
                     SendChat(-1, CHAT_ALL, ChatterClientID, "Game is already paused");
+                }
             }
             else
             {
