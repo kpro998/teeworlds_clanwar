@@ -103,6 +103,9 @@ protected:
 	int m_SuddenDeath;
 	int m_aTeamscore[NUM_TEAMS];
 
+	int m_DefTrainingPos;
+	int m_DefTrainingTeam;
+
 	void EndMatch() { SetGameState(IGS_END_MATCH, TIMER_END); }
 	void EndRound() { SetGameState(IGS_END_ROUND, TIMER_END/2); }
 
@@ -219,6 +222,12 @@ public:
 
 	int GetRealPlayerNum() const { return m_aTeamSize[TEAM_RED]+m_aTeamSize[TEAM_BLUE]; }
 	int GetStartTeam();
+
+	//atk def training
+	void SetDefPos(int pos){ m_DefTrainingPos = pos; }
+	void SetDefTeam(int team){ m_DefTrainingTeam = team; }
+	int GetDefPos(){ return m_DefTrainingPos; }
+	int GetDefTeam(){ return m_DefTrainingTeam; }
 };
 
 #endif

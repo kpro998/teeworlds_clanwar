@@ -146,6 +146,7 @@ MACRO_CONFIG_INT(SvLaserJumps, sv_laser_jumps, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_SER
 
 MACRO_CONFIG_INT(SvHookKill, sv_hook_kill, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Activate or deactivate only kills on hooked players")
 
+MACRO_CONFIG_INT(SvDefTraining, sv_def_training, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Activate or deactivate defend training")
 
 // debug
 #ifdef CONF_DEBUG // this one can crash the server if not used correctly

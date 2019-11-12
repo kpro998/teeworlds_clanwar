@@ -71,6 +71,8 @@ private:
 
 	bool m_Alive;
 
+	vec2 m_OldPos;
+
 	// weapon info
 	CEntity *m_apHitObjects[10];
 	int m_NumObjectsHit;

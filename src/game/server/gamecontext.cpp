@@ -1622,6 +1622,20 @@ void CGameContext::ConchainGameinfoUpdate(IConsole::IResult *pResult, void *pUse
 	}
 }
 
+void CGameContext::ConSetDefTeam(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int Team = clamp(pResult->GetInteger(0), 0, 1);//Only red and blue, no spectators
+	pSelf->m_pController->SetDefTeam(Team);
+}
+
+void CGameContext::ConSetDefPos(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int Pos = clamp(pResult->GetInteger(0), 0, 9999);
+	pSelf->m_pController->SetDefTeam(Pos);
+}
+
 void CGameContext::OnConsoleInit()
 {
 	m_pServer = Kernel()->RequestInterface<IServer>();
@@ -1648,6 +1662,9 @@ void CGameContext::OnConsoleInit()
 	Console()->Register("remove_vote", "s", CFGFLAG_SERVER, ConRemoveVote, this, "remove a voting option");
 	Console()->Register("clear_votes", "", CFGFLAG_SERVER, ConClearVotes, this, "Clears the voting options");
 	Console()->Register("vote", "r", CFGFLAG_SERVER, ConVote, this, "Force a vote to yes/no");
+
+	Console()->Register("set_def_team", "i", CFGFLAG_SERVER, ConSetDefTeam, this, "Set the team of the defenders");
+	Console()->Register("set_def_pos", "i", CFGFLAG_SERVER, ConSetDefTeam, this, "Set the position of the defenders death (set X position)");
 }
 
 void CGameContext::OnInit()
@@ -1667,15 +1684,15 @@ void CGameContext::OnInit()
 	// select gametype
 	if(str_comp_nocase(g_Config.m_SvGametype, "mod") == 0)
 		m_pController = new CGameControllerMOD(this);
-	else if(str_comp_nocase(g_Config.m_SvGametype, "ctf") == 0)
+	else if(str_comp_nocase(g_Config.m_SvGametype, "ctf") == 0 || str_comp_nocase(g_Config.m_SvGametype, "ctf+") == 0)
 		m_pController = new CGameControllerCTF(this);
-	else if(str_comp_nocase(g_Config.m_SvGametype, "lms") == 0)
+	else if(str_comp_nocase(g_Config.m_SvGametype, "lms") == 0 || str_comp_nocase(g_Config.m_SvGametype, "lms+") == 0)
 		m_pController = new CGameControllerLMS(this);
-	else if(str_comp_nocase(g_Config.m_SvGametype, "lts") == 0)
+	else if(str_comp_nocase(g_Config.m_SvGametype, "lts") == 0 || str_comp_nocase(g_Config.m_SvGametype, "lts+") == 0)
 		m_pController = new CGameControllerLTS(this);
-	else if(str_comp_nocase(g_Config.m_SvGametype, "tdm") == 0)
+	else if(str_comp_nocase(g_Config.m_SvGametype, "tdm") == 0 || str_comp_nocase(g_Config.m_SvGametype, "tdm+") == 0)
 		m_pController = new CGameControllerTDM(this);
-    else if(str_comp_nocase(g_Config.m_SvGametype, "gctf") == 0)
+    else if(str_comp_nocase(g_Config.m_SvGametype, "gctf") == 0 || str_comp_nocase(g_Config.m_SvGametype, "gctf+") == 0)
 		m_pController = new CGameControllerGCTF(this);
 	else
 		m_pController = new CGameControllerDM(this);
@@ -1683,6 +1700,8 @@ void CGameContext::OnInit()
 	// create all entities from the game layer
 	CMapItemLayerTilemap *pTileMap = m_Layers.GameLayer();
 	CTile *pTiles = (CTile *)Kernel()->RequestInterface<IMap>()->GetData(pTileMap->m_Data);
+
+	m_pController->SetDefPos(pTileMap->m_Width/2);
 	for(int y = 0; y < pTileMap->m_Height; y++)
 	{
 		for(int x = 0; x < pTileMap->m_Width; x++)

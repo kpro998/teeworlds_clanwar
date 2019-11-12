@@ -65,6 +65,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 
 	m_pPlayer = pPlayer;
 	m_Pos = Pos;
+	m_OldPos = Pos;
 
 	m_Core.Reset();
 	m_Core.Init(&GameWorld()->m_Core, GameServer()->Collision());
@@ -563,11 +564,16 @@ void CCharacter::Tick()
 {
 	m_Core.m_Input = m_Input;
 	m_Core.Tick(true);
-
+    int DefX = GameServer()->m_pController->GetDefPos()*32;
 	// handle leaving gamelayer
 	if(GameLayerClipped(m_Pos))
 	{
 		Die(m_pPlayer->GetCID(), WEAPON_WORLD);
+	}
+	else if(g_Config.m_SvDefTraining && m_pPlayer->GetTeam() == GameServer()->m_pController->GetDefTeam() && ((m_Pos.x >= DefX && m_OldPos.x <= DefX) || (m_Pos.x <= DefX && m_OldPos.x >= DefX)))//if atk game on AND team is right AND position over limit
+	{
+        Die(m_pPlayer->GetCID(), WEAPON_WORLD);
+        GameServer()->SendChat(-1, CHAT_ALL, m_pPlayer->GetCID(), "You went over the defend-limit!");
 	}
 
 	// handle Weapons
@@ -595,6 +601,8 @@ void CCharacter::TickDefered()
 	bool StuckAfterMove = GameServer()->Collision()->TestBox(m_Core.m_Pos, vec2(28.0f, 28.0f));
 	m_Core.Quantize();
 	bool StuckAfterQuant = GameServer()->Collision()->TestBox(m_Core.m_Pos, vec2(28.0f, 28.0f));
+
+	m_OldPos = StartPos;
 	m_Pos = m_Core.m_Pos;
 
 	if(!StuckBefore && (StuckAfterMove || StuckAfterQuant))
