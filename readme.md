@@ -31,7 +31,13 @@ It allows chatcommands and has some variables (only for Instagib)
 | sv_laser_ammo_regen_time    | 128     | 1   | 2000 | laser ammo regeneration time in ms                 |
 | sv_laser_ammo_regen_num     | 6       | 1   | 10   | Maximum number of lasers if ammo regeneration on   |
 | sv_laser_jump               | 0       | 0   | 1    | Laser jumps (Currently not working!)               |
+| --------------------------- | ------- | --- | ---- | -------------------------------------------------- |
+| commands for training       |         |     |      |                                                    |
+| --------------------------- | ------- | --- | ---- | -------------------------------------------------- |
 | sv_hook_kill                | 0       | 0   | 1    | Allow only kills on hooked players                 |
+| sv_def_training             | 0       | 0   | 1    | Activate defend-training                           |
+| set_def_team                | 0       | 0   | 1    | Set defending team (Red=0, Blue=1)                 |
+| set_def_pos                 | middle  | 0   | 9999 | Set the defending death x-position                 |
 
 ## Teeworlds - A retro multiplayer shooter
 ---------------------------
