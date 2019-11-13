@@ -1336,9 +1336,12 @@ void CGameContext::ConRestart(IConsole::IResult *pResult, void *pUserData)
 
 void CGameContext::ConSetPlayerNum(IConsole::IResult *pResult, void *pUserData)
 {
-	//CGameContext *pSelf = (CGameContext *)pUserData;
+	CGameContext *pSelf = (CGameContext *)pUserData;
 	if(pResult->NumArguments())
+	{
 		g_Config.m_SvPlayerSlots = pResult->GetInteger(0);
+		pSelf->SendSettings(-1);
+    }
 }
 
 void CGameContext::ConSay(IConsole::IResult *pResult, void *pUserData)
