@@ -199,6 +199,12 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 {
     if(Mode == CHAT_ALL && ChatterClientID != -1)
     {
+		if (g_Config.m_SvAllowSpectatorChat == 0 && IsClientSpectator(ChatterClientID))
+		{
+			SendChat(-1, 0, ChatterClientID, "You can only talk in Team chat while spectating");
+			return;
+		}
+
         if(SendCommand(ChatterClientID, pText))
             return;
     }
