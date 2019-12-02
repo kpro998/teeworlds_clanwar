@@ -410,6 +410,14 @@ int CServer::GetClientInfo(int ClientID, CClientInfo *pInfo) const
 	return 0;
 }
 
+int CServer::GetClientAuthed(int ClientID) const
+{
+	if (ClientID < 0 || ClientID >= MAX_CLIENTS)
+		return AUTHED_NO;
+
+	return m_aClients[ClientID].m_Authed;
+}
+
 void CServer::GetClientAddr(int ClientID, char *pAddrStr, int Size) const
 {
 	if(ClientID >= 0 && ClientID < MAX_CLIENTS && m_aClients[ClientID].m_State == CClient::STATE_INGAME)

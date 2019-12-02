@@ -218,6 +218,7 @@ public:
 	bool IsAuthed(int ClientID) const;
 	bool IsBanned(int ClientID);
 	int GetClientInfo(int ClientID, CClientInfo *pInfo) const;
+	virtual int GetClientAuthed(int ClientID) const;
 	void GetClientAddr(int ClientID, char *pAddrStr, int Size) const;
 	int GetClientVersion(int ClientID) const;
 	const char *ClientName(int ClientID) const;
