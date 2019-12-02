@@ -148,6 +148,8 @@ MACRO_CONFIG_INT(SvHookKill, sv_hook_kill, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER,
 
 MACRO_CONFIG_INT(SvDefTraining, sv_def_training, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Activate or deactivate defend training")
 
+MACRO_CONFIG_INT(SvAllowSpectatorChat, sv_allow_spectator_chat, 1, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Allow spectators to chat to everyone")
+
 // debug
 #ifdef CONF_DEBUG // this one can crash the server if not used correctly
 	MACRO_CONFIG_INT(DbgDummies, dbg_dummies, 0, 0, MAX_CLIENTS, CFGFLAG_SERVER, "")
