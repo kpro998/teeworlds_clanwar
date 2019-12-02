@@ -1649,11 +1649,10 @@ void CGameContext::ConSetDefPos(IConsole::IResult *pResult, void *pUserData)
 void CGameContext::confakemsg (IConsole::IResult *pResult, void *pUserData)
 {
     CGameContext *pSelf = (CGameContext *)pUserData;
-
     int id = pResult->GetInteger(0);
     const char *msg = pResult->GetString(1);
     
-    CNetMsg_Sv_ChatCNetMsg_Sv_Chat Msg;
+    CNetMsg_Sv_Chat Msg;
     Msg.m_Mode = CHAT_ALL;
     Msg.m_ClientID = id;
     Msg.m_pMessage = msg;
