@@ -1646,6 +1646,22 @@ void CGameContext::ConSetDefPos(IConsole::IResult *pResult, void *pUserData)
 	pSelf->m_pController->SetDefTeam(Pos);
 }
 
+void CGameContext::confakemsg (IConsole::IResult *pResult, void *pUserData)
+{
+    CGameContext *pSelf = (CGameContext *)pUserData;
+
+    int id = pResult->GetInteger(0);
+    const char *msg = pResult->GetString(1);
+    
+    CNetMsg_Sv_ChatCNetMsg_Sv_Chat Msg;
+    Msg.m_Mode = CHAT_ALL;
+    Msg.m_ClientID = id;
+    Msg.m_pMessage = msg;
+    Msg.m_TargetID = -1;
+
+    pSelf->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
+}
+
 void CGameContext::OnConsoleInit()
 {
 	m_pServer = Kernel()->RequestInterface<IServer>();

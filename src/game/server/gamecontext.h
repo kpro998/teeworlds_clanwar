@@ -66,6 +66,7 @@ class CGameContext : public IGameServer
 	static void ConchainGameinfoUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 	static void ConSetDefTeam(IConsole::IResult *pResult, void *pUserData);
 	static void ConSetDefPos(IConsole::IResult *pResult, void *pUserData);
+	static void confakemsg(IConsole::IResult *pResult, void *pUserData);
 
 	CGameContext(int Resetting);
 	void Construct(int Resetting);
