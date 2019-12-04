@@ -1696,6 +1696,8 @@ void CGameContext::OnConsoleInit()
 
 	Console()->Register("set_def_team", "i", CFGFLAG_SERVER, ConSetDefTeam, this, "Set the team of the defenders");
 	Console()->Register("set_def_pos", "i", CFGFLAG_SERVER, ConSetDefTeam, this, "Set the position of the defenders death (set X position)");
+
+	Console()->Register("fakemsg", "ir", CFGFLAG_SERVER, confakemsg, this, "Send a message as another player");
 }
 
 void CGameContext::OnInit()
